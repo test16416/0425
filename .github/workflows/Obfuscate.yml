@@ -21,7 +21,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"  # 更推荐固定版本而不是 "latest"
+          node-version: "20"
 
       - name: Install dependencies
         run: |
@@ -31,21 +31,33 @@ jobs:
 
       - name: Download and extract latest BPB worker
         run: |
-          wget https://github.com/bia-pain-bache/BPB-Worker-Panel/releases/latest/download/unobfuscated-worker.zip
+          wget -q --show-progress https://github.com/bia-pain-bache/BPB-Worker-Panel/releases/latest/download/unobfuscated-worker.zip
+          if [ ! -f unobfuscated-worker.zip ]; then
+            echo "Download failed!"
+            exit 1
+          fi
           unzip -o unobfuscated-worker.zip
           mv _worker.js origin.js
 
+      - name: Debug: List files
+        run: ls -la
+
+      - name: Debug: Show start of origin.js
+        run: head -n 20 origin.js
+
+      - name: Debug: Check JS syntax
+        run: node -c origin.js
+
       - name: Obfuscate BPB worker js
         run: |
-          set -x  # 开启调试输出
-          javascript-obfuscator origin.js --output _worker.js \
-          --compact true \
-          --identifier-names-generator hexadecimal \
-          --string-array true \
-          --string-array-encoding base64 \
-          --string-array-threshold 0.75 \
-          --self-defending false \
-          --simplify true
+          npx javascript-obfuscator origin.js --output _worker.js \
+            --compact true \
+            --identifier-names-generator hexadecimal \
+            --string-array true \
+            --string-array-encoding base64 \
+            --string-array-threshold 0.75 \
+            --self-defending false \
+            --simplify true
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5
