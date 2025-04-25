@@ -21,60 +21,36 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "latest"
 
       - name: Install dependencies
         run: |
           npm install -g javascript-obfuscator
-          sudo apt-get update
-          sudo apt-get install -y unzip curl
+          sudo apt-get install -y unzip
 
       - name: Download and extract latest BPB worker
         run: |
-          echo "📥 Downloading BPB Worker zip..."
-          curl -L -o unobfuscated-worker.zip https://github.com/bia-pain-bache/BPB-Worker-Panel/releases/latest/download/unobfuscated-worker.zip
-
-          if [ ! -f unobfuscated-worker.zip ]; then
-            echo "❌ Download failed: unobfuscated-worker.zip not found!"
-            exit 1
-          fi
-
-          unzip -o unobfuscated-worker.zip || {
-            echo "❌ Unzip failed"
-            exit 1
-          }
-
-          if [ ! -f _worker.js ]; then
-            echo "❌ _worker.js not found after unzip!"
-            exit 1
-          fi
-
+          wget https://github.com/bia-pain-bache/BPB-Worker-Panel/releases/latest/download/unobfuscated-worker.zip
+          unzip -o unobfuscated-worker.zip
           mv _worker.js origin.js
-
-      - name: Debug: List files
-        run: ls -la
-
-      - name: Debug: Show start of origin.js
-        run: head -n 20 origin.js
-
-      - name: Debug: Check JS syntax
-        run: |
-          node -c origin.js || { echo "❌ JavaScript syntax error in origin.js"; exit 1; }
 
       - name: Obfuscate BPB worker js
         run: |
-          npx javascript-obfuscator origin.js --output _worker.js \
-            --compact true \
-            --identifier-names-generator hexadecimal \
-            --string-array true \
-            --string-array-encoding base64 \
-            --string-array-threshold 0.75 \
-            --self-defending false \
-            --simplify true || { echo "❌ Obfuscation failed"; exit 1; }
+          javascript-obfuscator origin.js --output _worker.js \
+          --compact true \
+          --identifier-names-generator hexadecimal \
+          --rename-globals true \
+          --string-array true \
+          --string-array-encoding 'base64' \
+          --string-array-threshold 0.75 \
+          --transform-object-keys true \
+          --self-defending false \
+          --simplify true
 
-      - name: Commit and push changes
+      - name: 提交更改
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: main
           commit_message: ':arrow_up: update latest bpb panel'
           commit_author: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
+          push_options: '--set-upstream'
