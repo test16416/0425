@@ -34,7 +34,7 @@ jobs:
       - name: Download and extract latest BPB worker
         run: |
           echo "Downloading BPB worker..."
-          wget -q https://github.com/bia-pain-bache/BPB-Worker-Panel/releases/latest/download/unobfuscated-worker.zip -O unobfuscated-worker.zip
+          wget -q https://objects.githubusercontent.com/github-production-release-asset-2e65be/745612559/e1059fd7-2b39-4943-9d3c-62e023d03973?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20250425%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250425T015339Z&X-Amz-Expires=300&X-Amz-Signature=0196742ec9428e303653f66305699a750fdd4badada9785119ab532bd5218206&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3Dworker.zip&response-content-type=application%2Foctet-stream
           if [ $? -ne 0 ]; then echo "Error downloading BPB worker"; exit 1; fi
           echo "Extracting BPB worker..."
           unzip -o unobfuscated-worker.zip -d . 
