@@ -25,17 +25,26 @@ jobs:
 
       - name: Install dependencies
         run: |
+          echo "Installing npm packages and required tools..."
           npm install -g javascript-obfuscator
+          sudo apt-get update
           sudo apt-get install -y unzip
+          echo "Dependencies installed."
 
       - name: Download and extract latest BPB worker
         run: |
-          wget https://github.com/bia-pain-bache/BPB-Worker-Panel/releases/latest/download/unobfuscated-worker.zip
-          unzip -o unobfuscated-worker.zip
+          echo "Downloading BPB worker..."
+          wget -q https://github.com/bia-pain-bache/BPB-Worker-Panel/releases/latest/download/unobfuscated-worker.zip -O unobfuscated-worker.zip
+          if [ $? -ne 0 ]; then echo "Error downloading BPB worker"; exit 1; fi
+          echo "Extracting BPB worker..."
+          unzip -o unobfuscated-worker.zip -d . 
+          if [ $? -ne 0 ]; then echo "Error extracting BPB worker"; exit 1; fi
           mv _worker.js origin.js
+          echo "BPB worker extracted and renamed."
 
       - name: Obfuscate BPB worker js
         run: |
+          echo "Obfuscating BPB worker..."
           javascript-obfuscator origin.js --output _worker.js \
           --compact true \
           --identifier-names-generator hexadecimal \
@@ -46,8 +55,10 @@ jobs:
           --transform-object-keys true \
           --self-defending false \
           --simplify true
+          if [ $? -ne 0 ]; then echo "Error obfuscating BPB worker"; exit 1; fi
+          echo "Obfuscation completed."
 
-      - name: 提交更改
+      - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: main
