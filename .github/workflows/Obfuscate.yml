@@ -27,16 +27,25 @@ jobs:
         run: |
           npm install -g javascript-obfuscator
           sudo apt-get update
-          sudo apt-get install -y unzip
+          sudo apt-get install -y unzip curl
 
       - name: Download and extract latest BPB worker
         run: |
-          wget -q --show-progress https://github.com/bia-pain-bache/BPB-Worker-Panel/releases/latest/download/unobfuscated-worker.zip
+          echo "📥 Downloading BPB Worker zip..."
+          curl -L -o unobfuscated-worker.zip https://github.com/bia-pain-bache/BPB-Worker-Panel/releases/latest/download/unobfuscated-worker.zip
+          
           if [ ! -f unobfuscated-worker.zip ]; then
-            echo "Download failed!"
+            echo "❌ Download failed: unobfuscated-worker.zip not found!"
             exit 1
           fi
-          unzip -o unobfuscated-worker.zip
+
+          unzip -o unobfuscated-worker.zip || { echo "❌ Unzip failed"; exit 1; }
+
+          if [ ! -f _worker.js ]; then
+            echo "❌ _worker.js not found after unzip!"
+            exit 1
+          fi
+
           mv _worker.js origin.js
 
       - name: Debug: List files
@@ -46,7 +55,8 @@ jobs:
         run: head -n 20 origin.js
 
       - name: Debug: Check JS syntax
-        run: node -c origin.js
+        run: |
+          node -c origin.js || { echo "❌ JavaScript syntax error in origin.js"; exit 1; }
 
       - name: Obfuscate BPB worker js
         run: |
@@ -57,7 +67,7 @@ jobs:
             --string-array-encoding base64 \
             --string-array-threshold 0.75 \
             --self-defending false \
-            --simplify true
+            --simplify true || { echo "❌ Obfuscation failed"; exit 1; }
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5
