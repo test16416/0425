@@ -33,13 +33,16 @@ jobs:
         run: |
           echo "📥 Downloading BPB Worker zip..."
           curl -L -o unobfuscated-worker.zip https://github.com/bia-pain-bache/BPB-Worker-Panel/releases/latest/download/unobfuscated-worker.zip
-          
+
           if [ ! -f unobfuscated-worker.zip ]; then
             echo "❌ Download failed: unobfuscated-worker.zip not found!"
             exit 1
           fi
 
-          unzip -o unobfuscated-worker.zip || { echo "❌ Unzip failed"; exit 1; }
+          unzip -o unobfuscated-worker.zip || {
+            echo "❌ Unzip failed"
+            exit 1
+          }
 
           if [ ! -f _worker.js ]; then
             echo "❌ _worker.js not found after unzip!"
