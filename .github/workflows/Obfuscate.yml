@@ -34,7 +34,7 @@ jobs:
       - name: Download and extract latest BPB worker
         run: |
           echo "Downloading BPB worker..."
-          wget -q https://objects.githubusercontent.com/github-production-release-asset-2e65be/745612559/ca117258-4b92-468b-bddd-b6fc29f0b7f1?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20250425%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250425T015705Z&X-Amz-Expires=300&X-Amz-Signature=a90ac266b7efa02d01c8f7d52ddbd017a27ce49ab8db204f8fc8a06c195f655d&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3Dworker.js&response-content-type=application%2Foctet-stream
+          wget https://objects.githubusercontent.com/github-production-release-asset-2e65be/745612559/ca117258-4b92-468b-bddd-b6fc29f0b7f1?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20250425%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250425T015705Z&X-Amz-Expires=300&X-Amz-Signature=a90ac266b7efa02d01c8f7d52ddbd017a27ce49ab8db204f8fc8a06c195f655d&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3Dworker.js&response-content-type=application%2Foctet-stream
           echo "Extracting BPB worker..."
           unzip -o unobfuscated-worker.zip -d . 
           if [ $? -ne 0 ]; then echo "Error extracting BPB worker"; exit 1; fi
